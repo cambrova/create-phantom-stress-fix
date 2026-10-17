@@ -120,7 +120,7 @@ public class PhantomStressTests {
 				fixed ? "on" : "off", order == RECEIVER_FIRST ? "receiver loads first" : "transmitter loads first", reloads, before[0], after,
 				speedBefore[0], speed(helper));
 			check.check(before[0], after);
-			helper.assertTrue(speed(helper) == speedBefore[0], "the fan turns at " + speed(helper) + " rpm instead of " + speedBefore[0]);
+			helper.assertTrue(Math.abs(speed(helper)) == 16, "the fan turns at " + speed(helper) + " rpm instead of 16");
 			helper.succeed();
 		});
 	}

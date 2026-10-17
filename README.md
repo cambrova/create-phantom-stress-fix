@@ -8,6 +8,6 @@ Config: `config/phantom_stress_fix.properties` (`enabled`).
 
 ## Tests
 
-GameTests unload and reload a motor, gearshift and fan the way a chunk load does, switching the gearshift right after the load. With the fix the network's stress is the same after three reloads; the control run without the fix has to show phantom stress. A third test reloads without switching anything.
+GameTests unload and reload a motor, gearshift and fan the way a chunk load does, switching the gearshift right after the load. With the fix the network's stress stays at 32 after three reloads; the control run without the fix has to show phantom stress (it climbs to 96). A third test loads the transmitter first, so nothing switches.
 
 MIT.
