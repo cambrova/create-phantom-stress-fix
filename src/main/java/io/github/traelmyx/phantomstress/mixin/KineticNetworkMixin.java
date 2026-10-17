@@ -17,7 +17,8 @@ import java.util.Map;
  * A loading network starts from its saved stress and capacity, and each block's load step ({@code addSilently}) takes
  * that block's share back out. Two ways skip that step: the block was disconnected before it (a gearshift switched by a
  * redstone link that loaded first), or it already rejoined the network. Its share then stayed on the network for good.
- * Here the share is taken out in both cases, once per loaded block.
+ * Here the share is taken out in both cases, once per loaded block. And once every member has loaded, nothing of the
+ * saved totals should be left, so whatever is left (phantom stress saved before this fix) is dropped.
  */
 @Mixin(value = KineticNetwork.class, remap = false)
 public abstract class KineticNetworkMixin {
@@ -53,7 +54,24 @@ public abstract class KineticNetworkMixin {
 		unloadedStress = Math.max(0, unloadedStress - share.phantom_stress_fix$stress());
 		unloadedCapacity = Math.max(0, unloadedCapacity - share.phantom_stress_fix$capacity());
 		unloadedMembers = Math.max(0, unloadedMembers - 1);
+		phantom_stress_fix$dropLeftovers();
 		updateNetwork();
+	}
+
+	@Unique
+	private void phantom_stress_fix$dropLeftovers() {
+		if (initialized && unloadedMembers == 0 && (unloadedStress != 0 || unloadedCapacity != 0)) {
+			unloadedStress = 0;
+			unloadedCapacity = 0;
+		}
+	}
+
+	@Inject(method = "addSilently", at = @At("RETURN"), require = 0)
+	private void phantom_stress_fix$afterLoadStep(KineticBlockEntity be, float lastCapacity, float lastStress, CallbackInfo ci) {
+		if (PhantomStressFix.enabled && unloadedMembers == 0 && (unloadedStress != 0 || unloadedCapacity != 0)) {
+			phantom_stress_fix$dropLeftovers();
+			updateNetwork();
+		}
 	}
 
 	@Inject(method = "initFromTE", at = @At("RETURN"), require = 0)
