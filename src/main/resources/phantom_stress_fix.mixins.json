@@ -4,6 +4,7 @@
 	"package": "io.github.traelmyx.phantomstress.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
+		"KineticBlockEntityMixin",
 		"KineticNetworkMixin"
 	],
 	"injectors": {
