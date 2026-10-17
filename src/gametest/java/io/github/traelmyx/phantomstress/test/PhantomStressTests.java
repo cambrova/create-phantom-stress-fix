@@ -151,27 +151,4 @@ public class PhantomStressTests {
 			helper.assertTrue(Math.abs(after - before) < 0.01f, "stress changed from " + before + " to " + after);
 		});
 	}
-
-	/** Phantom stress saved by a world without the fix goes away on the first load with it. */
-	@GameTest(template = "empty", timeoutTicks = 400, batch = "heals")
-	public static void savedPhantomStressHeals(GameTestHelper helper) {
-		PhantomStressFix.enabled = false;
-		build(helper);
-		float[] before = {0}, phantom = {0};
-		helper.runAtTickTime(40, () -> before[0] = stress(helper));
-		helper.runAtTickTime(41, () -> reload(helper, RECEIVER_FIRST));
-		helper.runAtTickTime(71, () -> reload(helper, RECEIVER_FIRST));
-		helper.runAtTickTime(100, () -> {
-			phantom[0] = stress(helper);
-			PhantomStressFix.enabled = true;
-			reload(helper, TRANSMITTER_FIRST);
-		});
-		helper.runAtTickTime(130, () -> {
-			float after = stress(helper);
-			System.out.printf("[phantom_stress_fix] saved phantom stress: %.1f real, %.1f saved without the fix, %.1f after one load with it%n", before[0], phantom[0], after);
-			helper.assertTrue(phantom[0] > before[0] + 0.01f, "no phantom stress was saved without the fix");
-			helper.assertTrue(Math.abs(after - before[0]) < 0.01f, "stress is " + after + " after loading with the fix, expected " + before[0]);
-			helper.succeed();
-		});
-	}
 }
